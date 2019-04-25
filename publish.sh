@@ -10,5 +10,5 @@ cd dist
 zip -X -r ../publish.zip *
 cd ..
 
-echo "Deploying Code"
+echo "Deploying Code to Lambda"
 aws lambda update-function-code --function-name urlShortener --zip-file fileb://./publish.zip

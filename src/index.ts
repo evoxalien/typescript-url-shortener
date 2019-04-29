@@ -1,10 +1,35 @@
-var shortURLHost: string = "www.short.com/";
-var possible: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-let response: any;
+'use strict'
+
+import * as uuid from 'uuid'
+
+const AWS = require('aws-sdk')
+const ddb = new AWS.DynamoDB.DocumentClient()
+
+var shortURLHost: string = "www.short.com/"
+var shortURLArray: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+let response: any
+const intShortenBase: number = shortURLArray.length
+
 export const handler = async (event: any = {}): Promise<any> => {
 
-    if(event['resource'] == '/post' && event['body'] != null)
+    if(event['resource'] == '/create' && event['body'] != null)
     {
+        const params = {
+            TableName: process.env.DYNAMODB_TABLE,
+            Item: {
+                id: uuid.v1(),
+                text: event['body'].toString(),
+                checked: false
+            }
+        }
+
+        console.log("params.Item.id:", params.Item.id)
+        console.log("params.Item.text:", params.Item.text)
+
+        addToDynamoDB(params)
+
+
+
         response = {
             'statusCode': 200,
             'body': JSON.stringify({
@@ -17,21 +42,68 @@ export const handler = async (event: any = {}): Promise<any> => {
         response = {
             'statusCode': 200,
             'body': JSON.stringify({
-                message: 'Get Request Made:'
+                message: 'Get Request Made:' + event['queryStringParameters']
             })
         }
     }
 
-    console.log(event);
-    return response;
+
+    
+    //console.log(event)
+    return response
+}
+
+
+
+/* Functions for Creating URL */
+
+function addToDynamoDB(params:any){
+    
+    ddb.putItem(params, function(err:any, data:any) {
+        if (err) console.log(err, err.stack); // an error occurred
+        else     console.log(data);           // successful response
+      })
+    return params.Item.id
+}
+/*
+function lookupID(){
+    var returnVal: string = ""
+
+    return returnVal
+}
+
+function createURL(id:string){
+    var returnVal: string = ""
+
+    return returnVal
+}
+*/
+/* Functions for Retrieving URL */
+
+/*
+function convertToID(url:string){
+    var returnVal: string = ""
+
+    return returnVal
+}
+
+function expandURL(url:string){
+    var longURL: string = ""
+
+    return longURL
+}
+
+
+function getFromDyanmoDB(){
+
 }
 
 function shortenURL(url:string){
-    var shortURL: string = "";
-    var something = possible.slice();
-    return shortURLHost + shortURL;
-}
+    var shortURL: string = ""
 
+    return shortURLHost + shortURL
+}
+*/
 /*
 URL Shorten Request Comes in:
 Check if Address is already in DynamoDB

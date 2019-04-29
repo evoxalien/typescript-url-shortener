@@ -4,6 +4,7 @@ import * as uuid from 'uuid'
 
 const AWS = require('aws-sdk')
 const ddb = new AWS.DynamoDB.DocumentClient()
+ddb.endpoint = 'http://localhost:8000';
 
 var shortURLHost: string = "www.short.com/"
 var shortURLArray: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
